@@ -1,0 +1,6 @@
+.venv
+__pycache__
+.vscode/
+pyproject.toml
+poetry.lock
+*.pyc
