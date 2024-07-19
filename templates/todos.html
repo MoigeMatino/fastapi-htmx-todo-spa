@@ -1,5 +1,5 @@
 {% for todo in todos %}
 <li>
-  {{todo.title}}
+  <input name="title" value="{{todo.title}}" hx-put="/todos/{{todo.id}}" hx-target="#todos" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
 </li>
 {% endfor %}
