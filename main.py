@@ -52,3 +52,13 @@ async def update_todo(request: Request, todo_id: str, title:Annotated[str, Form(
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
+
+@app.post("/todos/{todo_id}/toggle", response_class=HTMLResponse)
+async def toggle_todo(request: Request, todo_id: str):
+    for index, todo in enumerate(todos):
+        if str(todo.id) == todo_id:
+            todos[index].done = not todos[index].done
+            break
+    return templates.TemplateResponse(
+        request=request, name="todos.html", context={"todos": todos}
+    )
