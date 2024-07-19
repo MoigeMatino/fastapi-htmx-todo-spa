@@ -20,7 +20,7 @@ class Todo:
     def __init__(self, title):
         self.id = uuid4()
         self.title = title
-        self.title = False
+        self.done = False
 
 todos = []
 @app.get("/", response_class=HTMLResponse)
