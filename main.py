@@ -20,7 +20,7 @@ class Todo:
     def __init__(self, title):
         self.id = uuid4()
         self.title = title
-        self.completed = False
+        self.done = False
 
 todos = []
 @app.get("/", response_class=HTMLResponse)
@@ -39,6 +39,16 @@ async def list_todos(request: Request, hx_request: Annotated[Union[str, None], H
 @app.post("/todos", response_class=HTMLResponse)
 async def create_todo(request: Request, todo: Annotated[str, Form()]):
     todos.append(Todo(todo))
+    return templates.TemplateResponse(
+        request=request, name="todos.html", context={"todos": todos}
+    )
+
+@app.put("/todos/{todo_id}", response_class=HTMLResponse)
+async def update_todo(request: Request, todo_id: str, title:Annotated[str, Form()]):
+    for todo in todos:
+        if str(todo.id) == todo_id:
+            todo.title = title
+            break
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
