@@ -1,5 +1,6 @@
 {% for todo in todos %}
 <li>
-  <input name="title" value="{{todo.title}}" hx-put="/todos/{{todo.id}}" hx-target="#todos" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
+  <input name="title" value="{{todo.title}}" {% if todo.done %}style="text-decoration: line-through" disabled="true"{% endif %} hx-put="/todos/{{todo.id}}" hx-target="#todos" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
+  <input type="checkbox" {% if todo.done %}checked="true"{% endif %} hx-post="/todos/{{todo.id}}/toggle" hx-target="#todos" hx-swap="innerHTML">
 </li>
 {% endfor %}
