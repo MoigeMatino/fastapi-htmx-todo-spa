@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -22,8 +22,7 @@ class Todo:
         self.title = title
         self.completed = False
 
-todos = [Todo('Master FastAPI'), Todo('Master HTMX')]
-
+todos = []
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -35,3 +34,11 @@ async def list_todos(request: Request, hx_request: Annotated[Union[str, None], H
             request=request, name="todos.html", context={"todos": todos}
         )
     return JSONResponse(content=jsonable_encoder(todos))
+
+
+@app.post("/todos", response_class=HTMLResponse)
+async def create_todo(request: Request, todo: Annotated[str, Form()]):
+    todos.append(Todo(todo))
+    return templates.TemplateResponse(
+        request=request, name="todos.html", context={"todos": todos}
+    )
