@@ -62,3 +62,13 @@ async def toggle_todo(request: Request, todo_id: str):
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
+
+@app.delete("/todos/{todo_id}", response_class=HTMLResponse)
+async def delete_todo(request: Request, todo_id: str):
+    for index, todo in enumerate(todos):
+        if str(todo.id) == todo_id:
+            del todos[index]
+            break
+    return templates.TemplateResponse(
+        request=request, name="todos.html", context={"todos": todos}
+    )
