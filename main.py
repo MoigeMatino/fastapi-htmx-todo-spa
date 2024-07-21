@@ -63,7 +63,7 @@ async def toggle_todo(request: Request, todo_id: str):
         request=request, name="todos.html", context={"todos": todos}
     )
 
-@app.delete("/todos/{todo_id}", response_class=HTMLResponse)
+@app.delete("/todos/{todo_id}/delete", response_class=HTMLResponse)
 async def delete_todo(request: Request, todo_id: str):
     for index, todo in enumerate(todos):
         if str(todo.id) == todo_id:
