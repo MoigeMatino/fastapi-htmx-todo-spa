@@ -1,4 +1,4 @@
-# Todo App
+# FastAPI + HTMX Todo App
 
 A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This app allows users to create, update, toggle, and delete todo items. It also incorporates modern styling for a simple, clean and visually appealing user interface.
 
