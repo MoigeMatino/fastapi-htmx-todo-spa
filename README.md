@@ -81,5 +81,3 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 - **Update a Todo**: Edit the text directly in the list and it will be updated automatically.
 - **Toggle a Todo**: Click the checkbox to mark a task as completed or not completed.
 - **Delete a Todo**: Click the "❌" button to remove a task from the list.
-
-
