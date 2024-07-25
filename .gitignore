@@ -4,3 +4,7 @@ __pycache__
 pyproject.toml
 poetry.lock
 *.pyc
+.dockerignore
+
+# Ignore database password file
+db/password.txt
