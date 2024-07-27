@@ -5,6 +5,7 @@ pyproject.toml
 poetry.lock
 *.pyc
 .dockerignore
+.env
 
 # Ignore database password file
 db/password.txt
