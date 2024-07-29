@@ -2,13 +2,14 @@ from contextlib import asynccontextmanager
 from typing import Annotated, Union
 from uuid import uuid4
 
-from fastapi import FastAPI, Form, Header, Request
+from fastapi import Depends, FastAPI, Form, Header, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlmodel import Session, select
 
-from database.db import init_db
+from database.db import get_session, init_db
 
 
 @asynccontextmanager
@@ -40,11 +41,15 @@ def index(request: Request):
 
 @app.get("/todos", response_class=HTMLResponse)
 async def list_todos(
-    request: Request, hx_request: Annotated[Union[str, None], Header()] = None
+    request: Request,
+    hx_request: Annotated[Union[str, None], Header()] = None,
+    session: Session = Depends(get_session),
 ):
+    statement = select(Todo)
+    results = session.exec(statement).all()
     if hx_request:
         return templates.TemplateResponse(
-            request=request, name="todos.html", context={"todos": todos}
+            request=request, name="todos.html", context={"todos": results}
         )
     return JSONResponse(content=jsonable_encoder(todos))
 
