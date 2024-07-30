@@ -114,11 +114,26 @@ async def update_todo(
 
 
 @app.post("/todos/{todo_id}/toggle", response_class=HTMLResponse)
-async def toggle_todo(request: Request, todo_id: str):
-    for index, todo in enumerate(todos):
-        if str(todo.id) == todo_id:
-            todos[index].done = not todos[index].done
-            break
+async def toggle_todo(
+    request: Request, todo_id: str, session: Session = Depends(get_session)
+):
+    # Query the todo item by ID
+    todo = session.exec(select(Todo).where(Todo.id == todo_id)).first()
+    if not todo:
+        return JSONResponse(content={"error": "Todo not found"}, status_code=404)
+
+    # Toggle the done status
+    todo.done = not todo.done
+
+    # Commit changes
+    session.add(todo)
+    session.commit()
+    session.refresh(todo)
+
+    # Fetch the updated list of todos
+    todos = session.exec(select(Todo)).all()
+
+    # Render the updated list of todos
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
