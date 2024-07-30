@@ -47,10 +47,10 @@ async def list_todos(
     session: Session = Depends(get_session),
 ):
     statement = select(Todo)
-    results = session.exec(statement).all()
+    todos = session.exec(statement).all()
     if hx_request:
         return templates.TemplateResponse(
-            request=request, name="todos.html", context={"todos": results}
+            request=request, name="todos.html", context={"todos": todos}
         )
     return JSONResponse(content=jsonable_encoder(todos))
 
