@@ -86,11 +86,28 @@ async def create_todo(
 
 
 @app.put("/todos/{todo_id}", response_class=HTMLResponse)
-async def update_todo(request: Request, todo_id: str, title: Annotated[str, Form()]):
-    for todo in todos:
-        if str(todo.id) == todo_id:
-            todo.title = title
-            break
+async def update_todo(
+    request: Request,
+    todo_id: str,
+    title: Annotated[str, Form()],
+    session: Session = Depends(get_session),
+):
+    # Query the todo item by ID
+    todo = session.exec(select(Todo).where(Todo.id == todo_id)).first()
+    if not todo:
+        return JSONResponse(content={"error": "Todo not found"}, status_code=404)
+
+    # Update the title
+    todo.title = title
+
+    # Commit changes
+    session.add(todo)
+    session.commit()
+    session.refresh(todo)
+
+    # Fetch the updated list of todos
+    todos = session.exec(select(Todo)).all()
+    # Render the updated list of todos
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
