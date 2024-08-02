@@ -1,6 +1,6 @@
 # FastAPI + HTMX Todo App
 
-A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This app allows users to create, update, toggle, and delete todo items. It also incorporates modern styling for a simple, clean and visually appealing user interface.
+A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This app allows users to create, update, toggle, and delete todo items. It also incorporates modern styling for a simple, clean, and visually appealing user interface.
 
 ## Table of Contents
 
@@ -10,10 +10,9 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Running the App](#running-the-app)
-- [Directory Structure](#directory-structure)
+  - [Stopping the App](#stopping-the-app)
 - [File Descriptions](#file-descriptions)
 - [Usage](#usage)
-
 
 ## Features
 
@@ -29,12 +28,14 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 - **HTMX**: A library that allows you to access modern browser features directly from HTML.
 - **Jinja2**: A templating engine for Python.
 - **Simple.css**: A classless CSS framework.
+- **Docker**: A platform for developing, shipping, and running applications in containers.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.10+
+- Docker
+- Docker Compose
 
 ### Installation
 
@@ -45,33 +46,39 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
     cd your-repo-name
     ```
 
-2. Create and activate a virtual environment:
+2. Create a `.env` file in the root directory with the following content:
 
-    ```bash
-    python -m venv .venv
-    source .`venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-
-3. Install the required packages:
-
-    ```bash
-    pip install fastapi uvicorn jinja2
+    ```plaintext
+    POSTGRES_DB=your_db_name
+    POSTGRES_USER=your_db_user
+    POSTGRES_PASSWORD=your_db_password
+    DB_HOST=db
+    DB_PORT=5433
     ```
 
 ### Running the App
 
-1. Start the FastAPI server:
+1. Build and start the Docker containers:
 
     ```bash
-    uvicorn main:app --reload
+    docker-compose up --build
     ```
 
 2. Open your browser and go to `http://127.0.0.1:8000` to view the app.
 
+### Stopping the App
+
+1. To stop the containers:
+
+    ```bash
+    docker-compose down
+    ```
 
 ## File Descriptions
 
 - `main.py`: The main application file where FastAPI routes are defined.
+- `Dockerfile`: The Dockerfile for building the FastAPI app image.
+- `docker-compose.yml`: Docker Compose configuration file.
 - `templates/index.html`: The main HTML file for rendering the todo list.
 - `static/styles.css`: The CSS file for styling the app.
 
@@ -81,3 +88,4 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 - **Update a Todo**: Edit the text directly in the list and it will be updated automatically.
 - **Toggle a Todo**: Click the checkbox to mark a task as completed or not completed.
 - **Delete a Todo**: Click the "❌" button to remove a task from the list.
+
