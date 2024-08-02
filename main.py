@@ -140,11 +140,17 @@ async def toggle_todo(
 
 
 @app.delete("/todos/{todo_id}/delete", response_class=HTMLResponse)
-async def delete_todo(request: Request, todo_id: str):
-    for index, todo in enumerate(todos):
-        if str(todo.id) == todo_id:
-            del todos[index]
-            break
+async def delete_todo(
+    request: Request, todo_id: str, session: Session = Depends(get_session)
+):
+    statement = select(Todo).where(Todo.id == todo_id)
+    results = session.exec(statement)
+    todo = results.one()
+    session.delete(todo)
+    session.commit()
+
+    todos = session.exec(select(Todo)).all()
+
     return templates.TemplateResponse(
         request=request, name="todos.html", context={"todos": todos}
     )
