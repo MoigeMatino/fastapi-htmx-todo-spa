@@ -76,11 +76,11 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 
 ## File Descriptions
 
-- `main.py`: The main application file where FastAPI routes are defined.
+- `app/main.py`: The main application file where FastAPI routes are defined.
 - `Dockerfile`: The Dockerfile for building the FastAPI app image.
 - `docker-compose.yml`: Docker Compose configuration file.
-- `templates/index.html`: The main HTML file for rendering the todo list.
-- `static/styles.css`: The CSS file for styling the app.
+- `app/templates/index.html`: The main HTML file for rendering the todo list.
+- `app/static/styles.css`: The CSS file for styling the app.
 
 ## Usage
 
