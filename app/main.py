@@ -9,8 +9,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 
-from database.db import get_session, init_db
-from models import TodoCreate
+from app.database.db import get_session, init_db
+from app.models import TodoCreate
 
 
 @asynccontextmanager
@@ -20,8 +20,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+templates = Jinja2Templates(directory="app/templates")
 
 
 # create in-memory Todo model; usecase for dataclass

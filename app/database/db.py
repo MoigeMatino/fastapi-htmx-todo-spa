@@ -1,6 +1,6 @@
 from sqlmodel import Session, SQLModel, create_engine
 
-from config import Settings
+from app.config import Settings
 
 from .. import models  # noqa: F401
 
