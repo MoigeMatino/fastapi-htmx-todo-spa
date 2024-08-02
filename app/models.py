@@ -4,7 +4,8 @@ from sqlmodel import Field, SQLModel
 
 
 class TodoBase(SQLModel):
-    title: bool = Field(default=False)
+    title: str
+    done: bool = False
 
 
 class Todo(TodoBase, table=True):
