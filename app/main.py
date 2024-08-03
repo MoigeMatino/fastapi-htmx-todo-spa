@@ -10,7 +10,7 @@ from sqlmodel import Session, select
 
 from app.database.db import get_session, init_db
 from app.models import Todo, TodoCreate
-from app.utils import add_todo, get_todos
+from app.utils import db_create_todo, db_get_todos, db_update_todo
 
 
 @asynccontextmanager
@@ -35,7 +35,7 @@ async def list_todos(
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
 ):
-    todos = get_todos(session)
+    todos = db_get_todos(session)
     if hx_request:
         return templates.TemplateResponse(
             request=request, name="todos.html", context={"todos": todos}
@@ -55,12 +55,12 @@ async def create_todo(
 
     try:
         # Create an instance of `Todo` from the validated `TodoCreate` data
-        add_todo(session, todo_data)
+        db_create_todo(session, todo_data)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Fetch the updated list of todos
-    todos = get_todos(session)
+    todos = db_get_todos(session)
 
     if hx_request:
         return templates.TemplateResponse(
@@ -77,21 +77,13 @@ async def update_todo(
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
 ):
-    # Query the todo item by ID
-    todo = session.exec(select(Todo).where(Todo.id == todo_id)).first()
-    if not todo:
-        return JSONResponse(content={"error": "Todo not found"}, status_code=404)
-
-    # Update the title
-    todo.title = title
-
-    # Commit changes
-    session.add(todo)
-    session.commit()
-    session.refresh(todo)
+    try:
+        db_update_todo(session, todo_id, title)
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Fetch the updated list of todos
-    todos = session.exec(select(Todo)).all()
+    todos = db_get_todos(session)
     # Render the updated list of todos
     if hx_request:
         return templates.TemplateResponse(
