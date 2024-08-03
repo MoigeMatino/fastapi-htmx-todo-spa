@@ -4,6 +4,7 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 
 ## Table of Contents
 
+- [Unique Approach](#unique-approach)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
@@ -13,6 +14,10 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
   - [Stopping the App](#stopping-the-app)
 - [File Descriptions](#file-descriptions)
 - [Usage](#usage)
+
+## Unique Approach
+
+This project demonstrates a unique approach to building web applications by combining FastAPI with HTMX. By leveraging HTMX, the app provides a highly dynamic user experience with real-time updates directly in the browser without requiring full page reloads. This approach showcases how modern libraries can be integrated to create responsive and efficient web applications, even for seemingly simple tasks like managing a Todo list.
 
 ## Features
 
@@ -53,7 +58,7 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
     POSTGRES_USER=your_db_user
     POSTGRES_PASSWORD=your_db_password
     DB_HOST=db
-    DB_PORT=5433
+    DB_PORT=5432
     ```
 
 ### Running the App
@@ -88,4 +93,3 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 - **Update a Todo**: Edit the text directly in the list and it will be updated automatically.
 - **Toggle a Todo**: Click the checkbox to mark a task as completed or not completed.
 - **Delete a Todo**: Click the "❌" button to remove a task from the list.
-
