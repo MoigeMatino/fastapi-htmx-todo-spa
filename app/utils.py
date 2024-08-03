@@ -4,13 +4,13 @@ from sqlmodel import Session, select
 from app.models import Todo, TodoCreate
 
 
-def get_todos(session: Session):
+def db_get_todos(session: Session):
     statement = select(Todo)
     todos = session.exec(statement).all()
     return todos
 
 
-def create_todo(session: Session, todo_data: TodoCreate):
+def db_create_todo(session: Session, todo_data: TodoCreate):
     todo = Todo.model_validate(todo_data)
     try:
         session.add(todo)
@@ -26,3 +26,30 @@ def create_todo(session: Session, todo_data: TodoCreate):
         # Handle the exception
         session.rollback()
         raise HTTPException(status_code=400, detail=f"Error creating todo: {str(e)}")
+
+
+def db_update_todo(session: Session, todo_id: str, title: str):
+    statement = select(Todo).where(Todo.id == todo_id)
+    todo = session.exec(statement).first()
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    todo.title = title
+    session.add(todo)
+    session.commit()
+    session.refresh(todo)
+    return todo
+
+
+def db_toggle_todo(session: Session, todo_id: str):
+    statement = select(Todo).where(Todo.id == todo_id)
+    todo = session.exec(statement).first()
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+    # Toggle the done status
+    todo.done = not todo.done
+    # Commit changes
+    session.add(todo)
+    session.commit()
+    session.refresh(todo)
+    return todo
