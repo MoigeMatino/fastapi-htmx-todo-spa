@@ -25,3 +25,5 @@ repos:
     rev: 5.13.2
     hooks:
       - id: isort
+        # https://stackoverflow.com/questions/77786047/git-pre-commit-hook-isort-and-black-keep-failing-for-a-python-project
+        args: ["--profile", "black"]
