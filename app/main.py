@@ -47,6 +47,7 @@ async def list_todos(
 async def create_todo(
     request: Request,
     todo: Annotated[str, Form()],  # form parsing
+    hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
 ):
     # Parse form data into `TodoCreate` data model for validation
@@ -71,9 +72,11 @@ async def create_todo(
     # Fetch the updated list of todos
     todos = session.exec(select(Todo)).all()
 
-    return templates.TemplateResponse(
-        request=request, name="todos.html", context={"todos": todos}
-    )
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="todos.html", context={"todos": todos}
+        )
+    return JSONResponse(content=jsonable_encoder(todos))
 
 
 @app.put("/todos/{todo_id}", response_class=HTMLResponse)
@@ -81,6 +84,7 @@ async def update_todo(
     request: Request,
     todo_id: str,
     title: Annotated[str, Form()],
+    hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
 ):
     # Query the todo item by ID
@@ -99,14 +103,19 @@ async def update_todo(
     # Fetch the updated list of todos
     todos = session.exec(select(Todo)).all()
     # Render the updated list of todos
-    return templates.TemplateResponse(
-        request=request, name="todos.html", context={"todos": todos}
-    )
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="todos.html", context={"todos": todos}
+        )
+    return JSONResponse(content=jsonable_encoder(todos))
 
 
 @app.post("/todos/{todo_id}/toggle", response_class=HTMLResponse)
 async def toggle_todo(
-    request: Request, todo_id: str, session: Session = Depends(get_session)
+    request: Request,
+    todo_id: str,
+    hx_request: Annotated[Union[str, None], Header()] = None,
+    session: Session = Depends(get_session),
 ):
     # Query the todo item by ID
     todo = session.exec(select(Todo).where(Todo.id == todo_id)).first()
@@ -125,14 +134,19 @@ async def toggle_todo(
     todos = session.exec(select(Todo)).all()
 
     # Render the updated list of todos
-    return templates.TemplateResponse(
-        request=request, name="todos.html", context={"todos": todos}
-    )
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="todos.html", context={"todos": todos}
+        )
+    return JSONResponse(content=jsonable_encoder(todos))
 
 
 @app.delete("/todos/{todo_id}/delete", response_class=HTMLResponse)
 async def delete_todo(
-    request: Request, todo_id: str, session: Session = Depends(get_session)
+    request: Request,
+    todo_id: str,
+    hx_request: Annotated[Union[str, None], Header()] = None,
+    session: Session = Depends(get_session),
 ):
     statement = select(Todo).where(Todo.id == todo_id)
     results = session.exec(statement)
@@ -142,6 +156,8 @@ async def delete_todo(
 
     todos = session.exec(select(Todo)).all()
 
-    return templates.TemplateResponse(
-        request=request, name="todos.html", context={"todos": todos}
-    )
+    if hx_request:
+        return templates.TemplateResponse(
+            request=request, name="todos.html", context={"todos": todos}
+        )
+    return JSONResponse(content=jsonable_encoder(todos))
