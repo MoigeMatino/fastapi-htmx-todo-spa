@@ -6,11 +6,17 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from app.database.db import get_session, init_db
-from app.models import Todo, TodoCreate
-from app.utils import db_create_todo, db_get_todos, db_toggle_todo, db_update_todo
+from app.models import TodoCreate
+from app.utils import (
+    db_create_todo,
+    db_delete_todo,
+    db_get_todos,
+    db_toggle_todo,
+    db_update_todo,
+)
 
 
 @asynccontextmanager
@@ -122,15 +128,11 @@ async def delete_todo(
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
 ):
-    statement = select(Todo).where(Todo.id == todo_id)
-    results = session.exec(statement)
-    todo = exec(statement)
-    todo = results.one()
-    session.delete(todo)
-    session.commit()
-
-    todos = session.exec(select(Todo)).all()
-
+    try:
+        db_delete_todo(session, todo_id)
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
+    todos = db_get_todos(session)
     if hx_request:
         return templates.TemplateResponse(
             request=request, name="todos.html", context={"todos": todos}

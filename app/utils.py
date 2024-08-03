@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
 from app.models import Todo, TodoCreate
@@ -25,14 +25,19 @@ def db_create_todo(session: Session, todo_data: TodoCreate):
     except Exception as e:
         # Handle the exception
         session.rollback()
-        raise HTTPException(status_code=400, detail=f"Error creating todo: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error creating todo: {str(e)}",
+        )
 
 
 def db_update_todo(session: Session, todo_id: str, title: str):
     statement = select(Todo).where(Todo.id == todo_id)
     todo = session.exec(statement).first()
     if not todo:
-        raise HTTPException(status_code=404, detail="Todo not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
+        )
     todo.title = title
     session.add(todo)
     session.commit()
@@ -44,7 +49,9 @@ def db_toggle_todo(session: Session, todo_id: str):
     statement = select(Todo).where(Todo.id == todo_id)
     todo = session.exec(statement).first()
     if not todo:
-        raise HTTPException(status_code=404, detail="Todo not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
+        )
 
     # Toggle the done status
     todo.done = not todo.done
@@ -52,4 +59,16 @@ def db_toggle_todo(session: Session, todo_id: str):
     session.add(todo)
     session.commit()
     session.refresh(todo)
+    return todo
+
+
+def db_delete_todo(session: Session, todo_id: str):
+    statement = select(Todo).where(Todo.id == todo_id)
+    todo = session.exec(statement).one_or_none
+    if not todo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
+        )
+    session.delete(todo)
+    session.commit()
     return todo
