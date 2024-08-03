@@ -10,7 +10,7 @@ from sqlmodel import Session, select
 
 from app.database.db import get_session, init_db
 from app.models import Todo, TodoCreate
-from app.utils import db_create_todo, db_get_todos, db_update_todo
+from app.utils import db_create_todo, db_get_todos, db_toggle_todo, db_update_todo
 
 
 @asynccontextmanager
@@ -99,21 +99,13 @@ async def toggle_todo(
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
 ):
-    # Query the todo item by ID
-    todo = session.exec(select(Todo).where(Todo.id == todo_id)).first()
-    if not todo:
-        return JSONResponse(content={"error": "Todo not found"}, status_code=404)
-
-    # Toggle the done status
-    todo.done = not todo.done
-
-    # Commit changes
-    session.add(todo)
-    session.commit()
-    session.refresh(todo)
+    try:
+        db_toggle_todo(session, todo_id)
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Fetch the updated list of todos
-    todos = session.exec(select(Todo)).all()
+    todos = db_get_todos(session)
 
     # Render the updated list of todos
     if hx_request:
@@ -132,6 +124,7 @@ async def delete_todo(
 ):
     statement = select(Todo).where(Todo.id == todo_id)
     results = session.exec(statement)
+    todo = exec(statement)
     todo = results.one()
     session.delete(todo)
     session.commit()
