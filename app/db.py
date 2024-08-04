@@ -1,10 +1,10 @@
 from sqlmodel import Session, SQLModel, create_engine
 
-from app.config import Settings
+from app.config import get_settings
 
-from .. import models  # noqa: F401
+from . import models  # noqa: F401
 
-settings = Settings()
+settings = get_settings()
 
 DATABASE_URL = (
     f"postgresql://{settings.postgres_user}:{settings.postgres_password}"
