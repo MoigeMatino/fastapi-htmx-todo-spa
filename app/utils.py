@@ -13,7 +13,6 @@ def db_get_todos(session: Session):
 def db_create_todo(session: Session, todo_data: TodoCreate):
     todo = Todo.model_validate(todo_data)
     try:
-        session.add(todo)
         # Add the `Todo` instance to the database
         session.add(todo)
         session.commit()
@@ -48,6 +47,7 @@ def db_update_todo(session: Session, todo_id: str, title: str):
 def db_toggle_todo(session: Session, todo_id: str):
     statement = select(Todo).where(Todo.id == todo_id)
     todo = session.exec(statement).first()
+
     if not todo:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
@@ -55,16 +55,18 @@ def db_toggle_todo(session: Session, todo_id: str):
 
     # Toggle the done status
     todo.done = not todo.done
+
     # Commit changes
     session.add(todo)
     session.commit()
     session.refresh(todo)
+
     return todo
 
 
 def db_delete_todo(session: Session, todo_id: str):
     statement = select(Todo).where(Todo.id == todo_id)
-    todo = session.exec(statement).one_or_none
+    todo = session.exec(statement).one_or_none()
     if not todo:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"

@@ -5,7 +5,8 @@ from sqlmodel import Session, SQLModel, create_engine
 from app.config import get_test_settings
 from app.db import get_session
 from app.main import app
-from app.models import Todo  # noqa: F401
+from app.models import Todo, TodoCreate  # noqa: F401
+from app.utils import db_create_todo
 
 
 @pytest.fixture(scope="session")
@@ -57,3 +58,10 @@ def override_session_fixture(session: Session):
     app.dependency_overrides[get_session] = override_get_session
     yield session
     app.dependency_overrides = {}
+
+
+@pytest.fixture(name="create_todo")
+def create_todo_fixture(override_session) -> Todo:
+    todo_data = TodoCreate(title="Test Todo Item")
+    todo = db_create_todo(override_session, todo_data)
+    return todo
