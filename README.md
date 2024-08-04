@@ -12,6 +12,7 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
   - [Installation](#installation)
   - [Running the App](#running-the-app)
   - [Stopping the App](#stopping-the-app)
+  - [Testing the App](#testing-the-app)
 - [File Descriptions](#file-descriptions)
 - [Usage](#usage)
 
@@ -77,6 +78,20 @@ This project demonstrates a unique approach to building web applications by comb
 
     ```bash
     docker-compose down
+    ```
+
+### Testing the App
+
+1. Make sure your Docker containers are running:
+
+    ```bash
+    docker-compose up -d
+    ```
+
+2. Run the tests using Docker Compose:
+
+    ```bash
+    docker-compose exec app pytest
     ```
 
 ## File Descriptions
