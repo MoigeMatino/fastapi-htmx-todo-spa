@@ -6,6 +6,7 @@ poetry.lock
 *.pyc
 .dockerignore
 .env
+.env.test
 
 # Ignore database password file
 db/password.txt
