@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
-from app.database.db import get_session, init_db
+from app.db import get_session, init_db
 from app.models import TodoCreate
 from app.utils import (
     db_create_todo,
