@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose exec app pytest --cov=app --maxfail=1
+docker-compose exec app pytest --cov=app
