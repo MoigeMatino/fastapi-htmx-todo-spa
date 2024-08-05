@@ -27,3 +27,11 @@ repos:
       - id: isort
         # https://stackoverflow.com/questions/77786047/git-pre-commit-hook-isort-and-black-keep-failing-for-a-python-project
         args: ["--profile", "black"]
+
+  - repo: local
+    hooks:
+      - id: run-pytest
+        name: Run Pytest
+        entry: ./scripts/run_tests.sh
+        language: system
+        types: [python]
