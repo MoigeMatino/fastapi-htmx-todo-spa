@@ -87,11 +87,16 @@ This project demonstrates a unique approach to building web applications by comb
     ```bash
     docker-compose up -d
     ```
+2. Make the `run_tests.sh` script executable:
+   
+   ```bash
+    chmod +x scripts/run_tests.sh
+    ```
 
-2. Run the tests using Docker Compose:
+4. Run the tests using the `run_tests.sh` script:
 
     ```bash
-    docker-compose exec app pytest
+    ./scripts/run_tests.sh
     ```
 
 ## File Descriptions
@@ -101,6 +106,7 @@ This project demonstrates a unique approach to building web applications by comb
 - `docker-compose.yml`: Docker Compose configuration file.
 - `app/templates/index.html`: The main HTML file for rendering the todo list.
 - `app/static/styles.css`: The CSS file for styling the app.
+- `scripts/run_tests.sh`: Script for running tests with Docker Compose.
 
 ## Usage
 
