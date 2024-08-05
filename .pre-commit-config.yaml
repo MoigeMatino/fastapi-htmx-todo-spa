@@ -27,11 +27,13 @@ repos:
       - id: isort
         # https://stackoverflow.com/questions/77786047/git-pre-commit-hook-isort-and-black-keep-failing-for-a-python-project
         args: ["--profile", "black"]
-
-  - repo: local
-    hooks:
-      - id: run-pytest
-        name: Run Pytest
-        entry: ./scripts/run_tests.sh
-        language: system
-        types: [python]
+  # * better to run a script to run tests before committing changes, also making pre-comit checks to be fast
+  # - repo: local
+  #   hooks:
+  #     - id: run-pytest
+  #       name: Run Pytest
+  #       entry: ./scripts/run_tests.sh
+  #       language: system
+  #       types: [python]
+  #       pass_filenames: false
+  #       always_run: true
