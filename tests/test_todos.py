@@ -18,3 +18,9 @@ def test_list_todos(client, override_session):
     assert hx_response.status_code == 200
     assert "Test Todo 1" in hx_response.text
     assert "Test Todo 2" in hx_response.text
+
+
+def test_create_todo(client):
+    response = client.post("/todos", data={"todo": "New Todo"})
+    assert response.status_code == 200
+    assert "New Todo" in response.text
