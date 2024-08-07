@@ -52,3 +52,12 @@ def test_toggle_todo(client, override_session):
     assert response.status_code == 200
     assert toggled_todo["title"] == "Toggle Todo"
     assert not toggled_todo["done"]
+
+
+def test_delete_todo(client, override_session):
+    todo_data = TodoCreate(title="Delete Todo")
+    todo = db_create_todo(override_session, todo_data)
+
+    response = client.delete(f"/todos/{todo.id}/delete")
+    assert response.status_code == 200
+    assert "Delete Todo" not in response.text
