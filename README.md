@@ -15,6 +15,7 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
   - [Testing the App](#testing-the-app)
 - [File Descriptions](#file-descriptions)
 - [Usage](#usage)
+- [API Documentation](#api-documentation)
 
 ## Unique Approach
 
@@ -87,13 +88,14 @@ This project demonstrates a unique approach to building web applications by comb
     ```bash
     docker-compose up -d
     ```
+
 2. Make the `run_tests.sh` script executable:
-   
-   ```bash
+
+    ```bash
     chmod +x scripts/run_tests.sh
     ```
 
-4. Run the tests using the `run_tests.sh` script:
+3. Run the tests using the `run_tests.sh` script:
 
     ```bash
     ./scripts/run_tests.sh
@@ -114,3 +116,10 @@ This project demonstrates a unique approach to building web applications by comb
 - **Update a Todo**: Edit the text directly in the list and it will be updated automatically.
 - **Toggle a Todo**: Click the checkbox to mark a task as completed or not completed.
 - **Delete a Todo**: Click the "❌" button to remove a task from the list.
+
+## API Documentation
+
+The FastAPI application automatically generates API documentation using Swagger UI and ReDoc. You can access these by visiting the following URLs in your browser:
+
+- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
