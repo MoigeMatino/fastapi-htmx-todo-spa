@@ -1,5 +1,5 @@
-from app.models import TodoCreate
-from app.utils import db_create_todo
+from app.models.todo import TodoCreate
+from app.utils.todo import db_create_todo
 
 
 def test_list_todos(client, override_session):

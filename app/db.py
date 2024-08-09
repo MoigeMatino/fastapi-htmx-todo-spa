@@ -1,8 +1,7 @@
 from sqlmodel import Session, SQLModel, create_engine
 
-from app.config import get_settings
-
-from . import models  # noqa: F401
+from app.dependencies import get_settings
+from app.models import todo  # noqa: F401
 
 settings = get_settings()
 
