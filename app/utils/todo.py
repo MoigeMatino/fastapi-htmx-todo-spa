@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from app.models import Todo, TodoCreate
+from app.models.todo import Todo, TodoCreate
 
 
 def db_get_todos(session: Session):

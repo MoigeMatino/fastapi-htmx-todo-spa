@@ -1,16 +1,14 @@
-from contextlib import asynccontextmanager
 from typing import Annotated, Union
 
-from fastapi import Depends, FastAPI, Form, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
-from app.db import get_session, init_db
-from app.models import TodoCreate
-from app.utils import (
+from app.db import get_session
+from app.models.todo import TodoCreate
+from app.utils.todo import (
     db_create_todo,
     db_delete_todo,
     db_get_todos,
@@ -18,24 +16,16 @@ from app.utils import (
     db_update_todo,
 )
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
 
-@app.get("/", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/todos", response_class=HTMLResponse)
+@router.get("/todos", response_class=HTMLResponse)
 async def list_todos(
     request: Request,
     hx_request: Annotated[Union[str, None], Header()] = None,
@@ -49,7 +39,7 @@ async def list_todos(
     return JSONResponse(content=jsonable_encoder(todos))
 
 
-@app.post("/todos", response_class=HTMLResponse)
+@router.post("/todos", response_class=HTMLResponse)
 async def create_todo(
     request: Request,
     todo: Annotated[str, Form()],  # form parsing
@@ -75,7 +65,7 @@ async def create_todo(
     return JSONResponse(content=jsonable_encoder(todos))
 
 
-@app.put("/todos/{todo_id}", response_class=HTMLResponse)
+@router.put("/todos/{todo_id}", response_class=HTMLResponse)
 async def update_todo(
     request: Request,
     todo_id: str,
@@ -98,7 +88,7 @@ async def update_todo(
     return JSONResponse(content=jsonable_encoder(todos))
 
 
-@app.post("/todos/{todo_id}/toggle", response_class=HTMLResponse)
+@router.post("/todos/{todo_id}/toggle", response_class=HTMLResponse)
 async def toggle_todo(
     request: Request,
     todo_id: str,
@@ -121,7 +111,7 @@ async def toggle_todo(
     return JSONResponse(content=jsonable_encoder(todos))
 
 
-@app.delete("/todos/{todo_id}/delete", response_class=HTMLResponse)
+@router.delete("/todos/{todo_id}/delete", response_class=HTMLResponse)
 async def delete_todo(
     request: Request,
     todo_id: str,

@@ -2,11 +2,11 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 
-from app.config import get_test_settings
+from app import app
 from app.db import get_session
-from app.main import app
-from app.models import Todo, TodoCreate  # noqa: F401
-from app.utils import db_create_todo
+from app.dependencies import get_test_settings
+from app.models.todo import Todo, TodoCreate  # noqa: F401
+from app.utils.todo import db_create_todo
 
 
 @pytest.fixture(scope="session")

@@ -1,7 +1,12 @@
 from sqlmodel import select
 
-from app.models import Todo, TodoCreate
-from app.utils import db_create_todo, db_delete_todo, db_toggle_todo, db_update_todo
+from app.models.todo import Todo, TodoCreate
+from app.utils.todo import (
+    db_create_todo,
+    db_delete_todo,
+    db_toggle_todo,
+    db_update_todo,
+)
 
 
 def test_db_create_todo(override_session):
