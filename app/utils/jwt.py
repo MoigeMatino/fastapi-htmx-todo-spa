@@ -29,10 +29,11 @@ def create_access_token(
 
 def verify_token(token: str) -> TokenData | None:
     try:
-        token_data = jwt.decode(token, settings.secret_key, settings.encryption_algo)
-        username: str = token_data.get("sub")
-        if not username:
-            return None
-        return TokenData(username=username)
+        decoded_token_data = jwt.decode(
+            token, settings.secret_key, settings.encryption_algo
+        )
+        if decoded_token_data["expire"] > datetime.now(datetime.UTC):
+            return decoded_token_data
+        return None
     except JWTError:
         return None
