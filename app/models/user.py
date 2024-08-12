@@ -4,7 +4,7 @@ from sqlmodel import Field, SQLModel
 
 
 class UserBase(SQLModel):
-    username: str
+    username: str = Field(unique=True)
 
 
 class User(UserBase, table=True):
@@ -12,9 +12,9 @@ class User(UserBase, table=True):
     hashed_password: str
 
 
-class UserCreateSerializer(UserBase):
+class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
 
 
-class UserResponseSerializer(UserBase):
+class UserResponse(UserBase):
     id: str

@@ -11,3 +11,7 @@ def verify_password(stored_hash_string: str, password: str) -> bool:
     stored_hash = stored_hash_string.encode()
 
     return bcrypt.checkpw(password.encode(), stored_hash)
+
+
+# def get_user_by_username(username: str, session: Session):
+#     user = session.exec(select(User).where(User.username == username)
