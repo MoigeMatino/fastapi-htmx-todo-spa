@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .db import init_db
 from .routes.todo import router as todo_router
+from .routes.user import router as auth_router
 
 
 @asynccontextmanager
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
 
     # Include routers for the application
     app.include_router(todo_router, tags=["todos"])
+    app.include_router(auth_router, prefix="/auth", tags=["todos"])
 
     return app
 
