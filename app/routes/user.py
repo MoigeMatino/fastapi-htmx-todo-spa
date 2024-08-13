@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post("/signup", response_model=UserResponse)
 def signup(user: UserCreate, session: Session = Depends(get_session)):
     # check if user exists
-    existing_user = get_user_by_username(user.username)
+    existing_user = get_user_by_username(user.username, session)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken"

@@ -41,7 +41,7 @@ def create_user_in_db(username: str, password: str, session: Session):
 
 def authenticate_user(username: str, password: str, session: Session):
     # retrieve user from db
-    user = get_user_by_username(username, password)
+    user = get_user_by_username(username, session)
     if user is None:
         return None
 
