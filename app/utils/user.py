@@ -7,8 +7,8 @@ def hash_password(password: str) -> str:
     return hashed_password_string
 
 
-def verify_password(stored_hash_string: str, password: str) -> bool:
-    stored_hash = stored_hash_string.encode()
+def verify_password(stored_hash_password: str, password: str) -> bool:
+    stored_hash = stored_hash_password.encode()
 
     return bcrypt.checkpw(password.encode(), stored_hash)
 
