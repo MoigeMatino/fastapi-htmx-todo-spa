@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from jose import JWTError, jwt
 
@@ -13,14 +13,12 @@ def create_access_token(
     token_data: dict, expires_delta: timedelta | None = None
 ) -> str:
     data_to_encode = token_data.copy()
-    if expires_delta:
-        expire = datetime.now(datetime.UTC) + expires_delta
-    else:
-        expire = datetime.now(datetime.UTC) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+    if expires_delta is None:
+        expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    data_to_encode.update({"expire": expire})
+    expire = datetime.now(timezone.utc) + expires_delta
+
+    data_to_encode.update({"expire": expire.isoformat()})
     encoded_jwt = jwt.encode(
         data_to_encode, settings.secret_key, settings.encryption_algo
     )
@@ -32,7 +30,7 @@ def verify_token(token: str) -> TokenData | None:
         decoded_token_data = jwt.decode(
             token, settings.secret_key, settings.encryption_algo
         )
-        if decoded_token_data["expire"] > datetime.now(datetime.UTC):
+        if decoded_token_data["expire"] > datetime.now(timezone.utc):
             return decoded_token_data
         return None
     except JWTError:
