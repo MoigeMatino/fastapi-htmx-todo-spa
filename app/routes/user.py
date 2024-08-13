@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 from app.db import get_session
 from app.models.user import User, UserCreate, UserResponse
 from app.utils.jwt import create_access_token
-from app.utils.user import hash_password, verify_password
+from app.utils.user import get_user_by_username, hash_password, verify_password
 
 router = APIRouter()
 
@@ -12,12 +12,11 @@ router = APIRouter()
 @router.post("/signup", response_model=UserResponse)
 def signup(user: UserCreate, session: Session = Depends(get_session)):
     # check if user exists
-    # TODO: create util to get user by username
-    statement = select(User).where(User.username == user.username)
-    existing_user = session.exec(statement).first()
+    existing_user = get_user_by_username(user.username)
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already taken")
-    # is user doesn't exist, create user in the database
+
+    # if user doesn't exist, create user in the database
     # TODO: create util to create user in db
     hashed_password = hash_password(user.password)
     new_user = User(username=user.username, hashed_password=hashed_password)

@@ -1,4 +1,7 @@
 import bcrypt
+from sqlmodel import Session, select
+
+from app.models.user import User
 
 
 def hash_password(password: str) -> str:
@@ -13,5 +16,7 @@ def verify_password(stored_hash_password: str, password: str) -> bool:
     return bcrypt.checkpw(password.encode(), stored_hash)
 
 
-# def get_user_by_username(username: str, session: Session):
-#     user = session.exec(select(User).where(User.username == username)
+def get_user_by_username(username: str, session: Session):
+    statement = select(User).where(User.username == username)
+    user = session.exec(statement).first()
+    return user
