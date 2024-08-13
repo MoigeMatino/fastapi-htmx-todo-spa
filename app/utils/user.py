@@ -37,3 +37,16 @@ def create_user_in_db(username: str, password: str, session: Session):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error creating user: {str(e)}",
         )
+
+
+def authenticate_user(username: str, password: str, session: Session):
+    # retrieve user from db
+    user = get_user_by_username(username, password)
+    if user is None:
+        return None
+
+    # verify user password
+    if not verify_password(user.hashed_password, password):
+        return None
+
+    return user
