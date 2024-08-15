@@ -1,4 +1,7 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from app.db import get_session
@@ -24,13 +27,18 @@ def signup(user: UserCreate, session: Session = Depends(get_session)):
 
 
 @router.post("/login")
-def login(user: UserCreate, session: Session = Depends(get_session)):
+def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: Session = Depends(get_session),
+):
     # authenticate user
-    authenticated_user = authenticate_user(user.username, user.password, session)
+    authenticated_user = authenticate_user(
+        form_data.username, form_data.password, session
+    )
     if not authenticated_user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid credentials"
         )
 
     access_token = create_access_token({"sub": authenticated_user.id})
-    return {"access_token": access_token}
+    return {"access_token": access_token, "token_type": "bearer"}
