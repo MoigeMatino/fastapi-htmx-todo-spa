@@ -1,29 +1,79 @@
+from typing import Annotated
+
 import bcrypt
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, select
 
 from app.models.user import User
+from app.utils.jwt import verify_token
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def hash_password(password: str) -> str:
+    """
+    Hashes the provided password using bcrypt with a cost factor of 12.
+
+    Args:
+        password (str): The password to be hashed.
+
+    Returns:
+        str: The hashed password.
+    """
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt(12))
     hashed_password_string = hashed_password.decode()
     return hashed_password_string
 
 
 def verify_password(stored_hash_password: str, password: str) -> bool:
+    """
+    Verifies the provided password against the stored password hash.
+
+    Args:
+        stored_hash_password (str): The stored password hash.
+        password (str): The password to be verified.
+
+    Returns:
+        bool: True if the provided password matches the stored hash, False otherwise.
+    """
     stored_hash = stored_hash_password.encode()
 
     return bcrypt.checkpw(password.encode(), stored_hash)
 
 
 def get_user_by_username(username: str, session: Session):
+    """
+    Retrieves a user from the database by their username.
+
+    Args:
+        username (str): The username of the user to retrieve.
+        session (Session): The database session to use for the query.
+
+    Returns:
+        User: The user object corresponding to the provided username,
+        or None if no user is found.
+    """
     statement = select(User).where(User.username == username)
     user = session.exec(statement).first()
     return user
 
 
 def create_user_in_db(username: str, password: str, session: Session):
+    """
+    Creates a new user in the database with the provided username and password.
+
+    Args:
+        username (str): The username for the new user.
+        password (str): The password for the new user.
+        session (Session): The database session to use for the operation.
+
+    Returns:
+        User: The newly created user object.
+
+    Raises:
+        HTTPException: If there is an error creating the user in the database.
+    """
     hashed_password = hash_password(password)
     new_user = User(username=username, hashed_password=hashed_password)
     try:
@@ -41,6 +91,17 @@ def create_user_in_db(username: str, password: str, session: Session):
 
 def authenticate_user(username: str, password: str, session: Session):
     # retrieve user from db
+    """
+    Retrieves a user from the database by their username.
+
+    Args:
+        username (str): The username of the user to retrieve.
+        session (Session): The database session to use for the query.
+
+    Returns:
+        User: The user object corresponding to the provided username,
+        or None if no user is found.
+    """
     user = get_user_by_username(username, session)
     if user is None:
         return None
@@ -49,4 +110,25 @@ def authenticate_user(username: str, password: str, session: Session):
     if not verify_password(user.hashed_password, password):
         return None
 
+    return user
+
+
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    """
+    Verifies the provided token and returns the corresponding user.
+
+    Args:
+        token (str): The authentication token to verify.
+
+    Returns:
+        User: The user associated with the verified token,
+        or None if the token is invalid.
+    """
+    user = verify_token(token)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return user
