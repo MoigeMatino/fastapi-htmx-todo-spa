@@ -3,8 +3,10 @@ from typing import Annotated
 import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError
 from sqlmodel import Session, select
 
+from app.models.token import TokenData
 from app.models.user import User
 from app.utils.jwt import verify_token
 
@@ -123,12 +125,26 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     Returns:
         User: The user associated with the verified token,
         or None if the token is invalid.
+
+    Raises:
+        HTTPException: If the token is invalid or the user cannot be found.
     """
-    user = verify_token(token)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = verify_token(token)
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = get_user_by_username(token_data.username)
+
+    if user is None:
+        raise credentials_exception
     return user
