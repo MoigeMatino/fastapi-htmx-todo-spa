@@ -1,7 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from app.db import get_session
@@ -11,6 +13,7 @@ from app.utils.jwt import create_access_token
 from app.utils.user import authenticate_user, create_user_in_db, get_user_by_username
 
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")
 
 
 @router.post("/signup", response_model=UserResponse)
@@ -45,3 +48,8 @@ def login(
 
     access_token = create_access_token({"sub": authenticated_user.username})
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.get("/login", response_class=HTMLResponse)
+async def show_login_form(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
