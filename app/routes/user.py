@@ -1,13 +1,12 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from app.db import get_session
-from app.models.token import Token
 from app.models.user import UserCreate, UserResponse
 from app.utils.jwt import create_access_token
 from app.utils.user import authenticate_user, create_user_in_db, get_user_by_username
@@ -34,7 +33,7 @@ def signup(user: UserCreate, session: Session = Depends(get_session)):
 def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Session = Depends(get_session),
-) -> Token:
+) -> RedirectResponse:
     # authenticate user
     authenticated_user = authenticate_user(
         form_data.username, form_data.password, session
@@ -47,7 +46,20 @@ def login(
         )
 
     access_token = create_access_token({"sub": authenticated_user.username})
-    return Token(access_token=access_token, token_type="bearer")
+    # Create a redirect response
+    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    # Set the authorization cookie
+    response.set_cookie(
+        key="Authorization",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        max_age=1800,
+        expires=1800,
+    )
+
+    response.headers["HX-Redirect"] = "/"
+    return response
 
 
 @router.get("/login", response_class=HTMLResponse)
