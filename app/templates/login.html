@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -12,20 +13,11 @@
     </div>
 
     <div class="form-container">
-        <form id="login-form" hx-post="/login">
+        <form id="login-form" hx-post="/auth/login" hx-redirect="/">
             <input type="text" name="username" placeholder="Username">
             <input type="password" name="password" placeholder="Password">
             <button type="submit">Login</button>
         </form>
     </div>
-
-    <script>
-        document.body.addEventListener('htmx:afterRequest', (event) => {
-            const redirectUrl = event.detail.xhr.getResponseHeader('HX-Redirect');
-            if (redirectUrl) {
-                window.location.href = redirectUrl;
-            }
-        });
-    </script>
 </body>
 </html>
