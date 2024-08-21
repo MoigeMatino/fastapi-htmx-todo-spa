@@ -51,14 +51,9 @@ def login(
 
     # Set the authorization cookie
     response.set_cookie(
-        key="Authorization",
-        value=f"Bearer {access_token}",
-        httponly=True,
-        max_age=1800,
-        expires=1800,
+        key="Authorization", value=f"Bearer {access_token}", httponly=True
     )
 
-    response.headers["HX-Redirect"] = "/"
     return response
 
 
