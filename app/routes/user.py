@@ -57,6 +57,6 @@ def login(
     return response
 
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/signup-login", response_class=HTMLResponse)
 async def show_login_form(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("auth.html", {"request": request})
