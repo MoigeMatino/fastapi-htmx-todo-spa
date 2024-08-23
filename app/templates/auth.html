@@ -73,6 +73,24 @@
             return false;
         });
 
+        function validateForm() {
+          const password = document.querySelector("form.signup input[name='password']").value;
+          const confirmPassword = document.querySelector("form.signup input[placeholder='Confirm password']").value;
+          const errorMessage = document.getElementById("error-message");
+
+          if (password !== confirmPassword) {
+              errorMessage.textContent = "Passwords do not match. Please try again.";
+              errorMessage.style.display = "block";
+              return false;
+          }
+          errorMessage.style.display = "none";
+          return true;
+    }
+
+    document.querySelector("form.signup").onsubmit = validateForm;
+</script>
+
+
     </script>
 </body>
 </html>
