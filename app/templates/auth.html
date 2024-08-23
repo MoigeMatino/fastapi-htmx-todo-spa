@@ -21,12 +21,12 @@
             <div class="slider-tab"></div>
           </div>
           <div class="form-inner">
-            <form action="/auth/login" method="post" class="login">
+            <form id="signupForm" action="/auth/login" method="post" class="login">
               <div class="field">
-                <input type="text" placeholder="Email Address" required>
+                <input type="text" name="username" placeholder="Username" required>
               </div>
               <div class="field">
-                <input type="password" placeholder="Password" required>
+                <input type="password" name="password" placeholder="Password" required>
               </div>
               <div class="pass-link"><a href="#">Forgot password?</a></div>
               <div class="field btn">
@@ -37,10 +37,10 @@
             </form>
             <form action="/auth/signup" method="post" class="signup">
               <div class="field">
-                <input type="text" placeholder="Email Address" required>
+                <input type="text" name="username" placeholder="Username" required>
               </div>
               <div class="field">
-                <input type="password" placeholder="Password" required>
+                <input type="password" name="password" placeholder="Password" required>
               </div>
               <div class="field">
                 <input type="password" placeholder="Confirm password" required>
@@ -49,6 +49,7 @@
                 <div class="btn-layer"></div>
                 <input type="submit" value="Signup">
               </div>
+              <div id="error-message" style="color: red; display: none;"></div>
             </form>
           </div>
         </div>
