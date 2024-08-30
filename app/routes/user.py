@@ -7,7 +7,6 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from app.db import get_session
-from app.models.user import UserResponse
 from app.utils.jwt import create_access_token
 from app.utils.user import authenticate_user, create_user_in_db, get_user_by_username
 
@@ -15,7 +14,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
 
-@router.post("/signup", response_model=UserResponse)
+@router.post("/signup")
 def signup(
     username: str = Form(...),
     password: str = Form(...),
@@ -29,8 +28,8 @@ def signup(
         )
 
     # if user doesn't exist, create user in the database
-    new_user = create_user_in_db(username, password, session)
-    return UserResponse(id=new_user.id, username=new_user.username)
+    create_user_in_db(username, password, session)
+    return {"success": True, "message": "Signup successful! Please log in."}
 
 
 @router.post("/login")
