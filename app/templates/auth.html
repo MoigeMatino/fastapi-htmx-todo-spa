@@ -136,16 +136,19 @@
                   this.reset();
                 } else {
 
-                  signupMessage.textContent = data.message || 'Signup failed. Please try again.';
+                  signupMessage.textContent = 'Username already taken. Please choose another.';
                   signupMessage.style.color = 'red';
                   signupMessage.style.display = 'block';
                   }
                 })
               .catch(error => {
                   console.error('Error:', error);
-                  messageElement.textContent = 'An error occurred. Please try again.';
-                  messageElement.style.color = 'red';
-                  messageElement.style.display = 'block';
+                  // Display the error message if username is already taken
+                  if (error.message === 'Username already taken') {
+                    messageElement.textContent = 'Username already taken. Please choose another.';
+                  } else {
+                    messageElement.textContent = error.message || 'An error occurred. Please try again.';
+                  }
               });
           }
         });
