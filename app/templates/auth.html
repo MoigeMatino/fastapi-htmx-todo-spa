@@ -21,13 +21,15 @@
             <div class="slider-tab"></div>
           </div>
           <div class="form-inner">
-            <form id="signupForm" action="/auth/login" method="post" class="login">
+            <!-- Login Form -->
+            <form id="loginForm" action="/auth/login" method="post" class="login">
               <div class="field">
                 <input type="text" name="username" placeholder="Username" required>
               </div>
               <div class="field">
                 <input type="password" name="password" placeholder="Password" required>
               </div>
+              <!-- TODO: handle forgot password workflow -->
               <div class="pass-link"><a href="#">Forgot password?</a></div>
               <div class="field btn">
                 <div class="btn-layer"></div>
@@ -35,7 +37,9 @@
               </div>
               <div class="signup-link">Not a member? <a href="">Signup now</a></div>
             </form>
-            <form action="/auth/signup" method="post" class="signup">
+
+            <!-- Signup Form -->
+            <form id="signupForm" action="/auth/signup" method="post" class="signup">
               <div class="field">
                 <input type="text" name="username" placeholder="Username" required>
               </div>
@@ -49,17 +53,20 @@
                 <div class="btn-layer"></div>
                 <input type="submit" value="Signup">
               </div>
-              <div id="error-message" style="color: red; display: none;"></div>
+              <div id="signup-message" style="color: red; display: none;"></div>
             </form>
           </div>
         </div>
       </div>
-    <script>
+      <script>
         const loginText = document.querySelector(".title-text .login");
         const loginForm = document.querySelector("form.login");
         const loginBtn = document.querySelector("label.login");
         const signupBtn = document.querySelector("label.signup");
+        const signupForm = document.getElementById("signupForm");
         const signupLink = document.querySelector("form .signup-link a");
+        const signupMessage = document.getElementById("signup-message");
+
         signupBtn.onclick = (()=>{
             loginForm.style.marginLeft = "-50%";
             loginText.style.marginLeft = "-50%";
@@ -68,29 +75,81 @@
             loginForm.style.marginLeft = "0%";
             loginText.style.marginLeft = "0%";
         });
-        signupLink.onclick = (()=>{
+        // signupLink.onclick = (()=>{
+        //     signupBtn.click();
+        //     return false;
+        // });
+        signupLink.onclick = (e) => {
+            e.preventDefault();
             signupBtn.click();
-            return false;
-        });
+        };
 
         function validateForm() {
           const password = document.querySelector("form.signup input[name='password']").value;
           const confirmPassword = document.querySelector("form.signup input[placeholder='Confirm password']").value;
-          const errorMessage = document.getElementById("error-message");
+          const messageElement = document.getElementById("signup-message");
 
           if (password !== confirmPassword) {
-              errorMessage.textContent = "Passwords do not match. Please try again.";
-              errorMessage.style.display = "block";
+              messageElement.textContent = "Passwords do not match. Please try again.";
+              messageElement.style.color = "red";
+              messageElement.style.display = "block";
               return false;
           }
-          errorMessage.style.display = "none";
+          messageElement.style.display = "none";
           return true;
-    }
+        }
 
-    document.querySelector("form.signup").onsubmit = validateForm;
-</script>
+        /**
+         * Handles the submission of the signup form, including form validation and sending the signup data to the server.
+         *
+         * When the signup form is submitted, this function first prevents the default form submission behavior.
+         * It then calls the `validateForm()` function to ensure the password and confirm password fields match.
+         * If the form is valid, it creates a FormData object from the form data and sends a POST request to the `/auth/signup` endpoint.
+         * If the signup is successful, it displays a success message, resets the form, and automatically switches to the login view after a short delay.
+         * If the signup fails, it displays an error message.
+         * If an error occurs during the request, it displays a generic error message.
+         */
+        signupForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const messageElement = document.getElementById('signup-message');
+
+          if (validateForm()) {
+              const formData = new FormData(this);
+              fetch('/auth/signup', {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  signupMessage.textContent = data.message;
+                  signupMessage.style.color = 'green';
+                  signupMessage.style.display = 'block';
+
+                  // Automatically switch to login view after successful signup
+                  setTimeout(() => {
+                    signupMessage.style.display = 'none';
+                    loginBtn.click();
+                  }, 1500);  // Delay for user to see the success message
 
 
-    </script>
+                  this.reset();
+                } else {
+
+                  signupMessage.textContent = data.message || 'Signup failed. Please try again.';
+                  signupMessage.style.color = 'red';
+                  signupMessage.style.display = 'block';
+                  }
+                })
+              .catch(error => {
+                  console.error('Error:', error);
+                  messageElement.textContent = 'An error occurred. Please try again.';
+                  messageElement.style.color = 'red';
+                  messageElement.style.display = 'block';
+              });
+          }
+        });
+      </script>
+
 </body>
 </html>
