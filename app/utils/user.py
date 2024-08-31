@@ -10,7 +10,7 @@ from app.models.token import TokenData
 from app.models.user import User
 from app.utils.jwt import verify_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def hash_password(password: str) -> str:
@@ -132,7 +132,9 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: Ses
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+        headers={
+            "WWW-Authenticate": "Bearer",
+        },
     )
 
     try:
