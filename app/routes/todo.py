@@ -8,13 +8,15 @@ from sqlmodel import Session
 
 from app.db import get_session
 from app.models.todo import TodoCreate
+from app.models.user import User
 from app.utils.todo import (
     db_create_todo,
     db_delete_todo,
-    db_get_todos,
+    db_get_user_todos,
     db_toggle_todo,
     db_update_todo,
 )
+from app.utils.user import get_current_user
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -30,8 +32,9 @@ async def list_todos(
     request: Request,
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    todos = db_get_todos(session)
+    todos = db_get_user_todos(session, current_user.id)
     if hx_request:
         return templates.TemplateResponse(
             request=request, name="todos.html", context={"todos": todos}
@@ -45,18 +48,19 @@ async def create_todo(
     todo: Annotated[str, Form()],  # form parsing
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     # Parse form data into `TodoCreate` data model for validation
     todo_data = TodoCreate(title=todo)
 
     try:
         # Create an instance of `Todo` from the validated `TodoCreate` data
-        db_create_todo(session, todo_data)
+        db_create_todo(session, todo_data, current_user.id)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Fetch the updated list of todos
-    todos = db_get_todos(session)
+    todos = db_get_user_todos(session, current_user.id)
 
     if hx_request:
         return templates.TemplateResponse(
@@ -72,6 +76,7 @@ async def update_todo(
     title: Annotated[str, Form()],
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         db_update_todo(session, todo_id, title)
@@ -79,7 +84,7 @@ async def update_todo(
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Fetch the updated list of todos
-    todos = db_get_todos(session)
+    todos = db_get_user_todos(session, current_user.id)
     # Render the updated list of todos
     if hx_request:
         return templates.TemplateResponse(
@@ -94,6 +99,7 @@ async def toggle_todo(
     todo_id: str,
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         db_toggle_todo(session, todo_id)
@@ -101,7 +107,7 @@ async def toggle_todo(
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Fetch the updated list of todos
-    todos = db_get_todos(session)
+    todos = db_get_user_todos(session, current_user.id)
 
     # Render the updated list of todos
     if hx_request:
@@ -117,14 +123,20 @@ async def delete_todo(
     todo_id: str,
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         db_delete_todo(session, todo_id)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
-    todos = db_get_todos(session)
+    todos = db_get_user_todos(session, current_user.id)
     if hx_request:
         return templates.TemplateResponse(
             request=request, name="todos.html", context={"todos": todos}
         )
     return JSONResponse(content=jsonable_encoder(todos))
+
+
+@router.get("/test-user")
+def test_user(current_user: User = Depends(get_current_user)):
+    return current_user

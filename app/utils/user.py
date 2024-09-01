@@ -1,16 +1,15 @@
-from typing import Annotated
-
 import bcrypt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlmodel import Session, select
 
+from app.db import get_session
 from app.models.token import TokenData
 from app.models.user import User
 from app.utils.jwt import verify_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def hash_password(password: str) -> str:
@@ -115,16 +114,17 @@ def authenticate_user(username: str, password: str, session: Session):
     return user
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: Session):
+def get_current_user(request: Request, session: Session = Depends(get_session)):
     """
-    Verifies the provided token and returns the corresponding user.
+    Verifies the provided token from the 'Authorization' cookie and
+    returns the corresponding user.
 
     Args:
-        token (str): The authentication token to verify.
+        request (Request): The incoming HTTP request.
+        session (Session): The database session to use for the query.
 
     Returns:
-        User: The user associated with the verified token,
-        or None if the token is invalid.
+        User: The user associated with the verified token.
 
     Raises:
         HTTPException: If the token is invalid or the user cannot be found.
@@ -136,15 +136,24 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: Ses
             "WWW-Authenticate": "Bearer",
         },
     )
+    token = request.cookies.get("Authorization")
+    if not token:
+        raise credentials_exception
 
     try:
+        token = token.replace("Bearer ", "")
+
         payload = verify_token(token)
+
+        if payload is None:
+            raise credentials_exception
         username: str = payload.get("sub")
-        if username is None:
+        if not username:
             raise credentials_exception
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
+
     user = get_user_by_username(token_data.username, session)
 
     if user is None:
