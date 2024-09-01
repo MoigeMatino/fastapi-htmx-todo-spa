@@ -4,14 +4,14 @@ from sqlmodel import Session, select
 from app.models.todo import Todo, TodoCreate
 
 
-def db_get_todos(session: Session):
-    statement = select(Todo)
+def db_get_user_todos(session: Session, user_id: str):
+    statement = select(Todo).where(Todo.user_id == user_id)
     todos = session.exec(statement).all()
     return todos
 
 
-def db_create_todo(session: Session, todo_data: TodoCreate):
-    todo = Todo.model_validate(todo_data)
+def db_create_todo(session: Session, todo_data: TodoCreate, user_id: str):
+    todo = Todo(title=todo_data.title, user_id=user_id)
     try:
         # Add the `Todo` instance to the database
         session.add(todo)

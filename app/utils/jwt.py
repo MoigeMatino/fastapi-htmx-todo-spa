@@ -1,12 +1,15 @@
 from datetime import datetime, timedelta, timezone
 
-from jose import JWTError, jwt
+from jose import jwt
 
 from app.dependencies import get_settings
-from app.models.token import TokenData
+
+# from app.models.token import TokenData
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 settings = get_settings()
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.encryption_algo
 
 
 def create_access_token(
@@ -18,20 +21,22 @@ def create_access_token(
 
     expire = datetime.now(timezone.utc) + expires_delta
 
-    data_to_encode.update({"expire": expire.isoformat()})
-    encoded_jwt = jwt.encode(
-        data_to_encode, settings.secret_key, settings.encryption_algo
-    )
+    # Store the expiration time as an integer
+    data_to_encode.update({"exp": int(expire.timestamp())})
+
+    encoded_jwt = jwt.encode(data_to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def verify_token(token: str) -> TokenData | None:
+def verify_token(token: str) -> dict | None:
     try:
-        decoded_token_data = jwt.decode(
-            token, settings.secret_key, settings.encryption_algo
-        )
-        if decoded_token_data["expire"] > datetime.now(timezone.utc):
-            return decoded_token_data
+        decoded_token_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        # Check if the token has expired
+        if decoded_token_data["exp"] < int(datetime.now(timezone.utc).timestamp()):
+            return None  # Token has expired
+        return decoded_token_data
+    except jwt.ExpiredSignatureError:
         return None
-    except JWTError:
+    except jwt.JWTError:
         return None
