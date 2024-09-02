@@ -24,7 +24,10 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    username = request.query_params.get("username", "")
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "username": username}
+    )
 
 
 @router.get("/todos", response_class=HTMLResponse)
