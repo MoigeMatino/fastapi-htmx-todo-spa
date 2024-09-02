@@ -1,14 +1,20 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from app.db import get_session
+from app.models.user import User
 from app.utils.jwt import create_access_token
-from app.utils.user import authenticate_user, create_user_in_db, get_user_by_username
+from app.utils.user import (
+    authenticate_user,
+    create_user_in_db,
+    get_current_user,
+    get_user_by_username,
+)
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -66,3 +72,19 @@ def login(
 @router.get("/signup-login", response_class=HTMLResponse)
 async def show_login_form(request: Request):
     return templates.TemplateResponse("auth.html", {"request": request})
+
+
+@router.get("/logout")
+async def logout(response: Response):
+    response = RedirectResponse(url="signup-login", status_code=302)
+    response.delete_cookie("Authorization")
+    return response
+
+
+@router.get("/me", response_model=User)
+async def get_me(current_user: User = Depends(get_current_user)):
+    if current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
+    return current_user
