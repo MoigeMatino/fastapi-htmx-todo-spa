@@ -50,7 +50,10 @@ def login(
 
     access_token = create_access_token({"sub": authenticated_user.username})
     # Create a redirect response
-    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    response = RedirectResponse(
+        url=f"/?username={authenticated_user.username}",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
     # Set the authorization cookie
     response.set_cookie(
