@@ -6,91 +6,13 @@
     <title>My Todo</title>
     <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <link rel="stylesheet" href="/static/dropdown.css">
+    <link rel="stylesheet" href="/static/modal.css">
     <link rel="stylesheet" href="/static/main.css">
-    <style>
 
-        .user-menu {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .user-menu input[type="checkbox"] {
-            display: none;
-        }
-        .user-menu label {
-            font-size: 16px;
-            font-weight: 500;
-            color: #fff;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
-        }
-        .user-menu label:hover {
-            color: #ffeb3b;
-        }
-        .user-menu .username {
-            color: #ffeb3b;
-        }
-        .dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: #444;
-            border-radius: 15px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-            min-width: 160px;
-            z-index: 1;
-        }
-        .dropdown a {
-            color: #f5f5f5;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            border-bottom: 1px solid #555;
-            border-radius: 15px;
-            transition: background-color 0.3s;
-        }
-        .dropdown a:hover {
-            background-color: #555;
-        }
-        .user-menu input[type="checkbox"]:checked ~ .dropdown {
-            display: block;
-        }
-        .user-menu .arrow {
-            border: solid #fff;
-            border-width: 0 2px 2px 0;
-            display: inline-block;
-            padding: 3px;
-            margin-left: 5px;
-            transform: rotate(45deg);
-            vertical-align: middle;
-        }
-        .login-link {
-            font-size: 16px;
-            font-weight: 500;
-            color: #ffeb3b;
-            cursor: pointer;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
-        }
-        .login-link:hover {
-            color: #fda635;
-        }
-    </style>
 </head>
 <body>
+    <!-- User menu -->
     <div class="user-menu">
         {% if username %}
             <!-- Hidden checkbox to control dropdown visibility -->
@@ -101,26 +23,73 @@
             </label>
             <div class="dropdown">
                 <a href="/profile">Profile</a>
-                <a href="/logout">Logout</a>
+                <a href="auth/logout">Logout</a>
             </div>
         {% else %}
             <a class="login-link" href="auth/signup-login">Login</a>
         {% endif %}
     </div>
+
+    <!-- Modal for alert -->
+    <div id="alert-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <p>You must be logged in to create a todo item. <a href="auth/signup-login">Log in</a> first.</p>
+        </div>
+    </div>
+
     <div class="header">
         <h1>My To-do List</h1>
     </div>
+
+    <!-- Form to create new todo -->
     <div class="todo-form">
         <!-- Form to create new todo -->
-        <form hx-post="/todos" hx-target="#todos" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
+        <form id="todo-form" hx-post="/todos" hx-target="#todos" hx-swap="innerHTML" hx-on:htmx:after-request="this.reset()">
             <input type="text" name="todo" placeholder="I get to..." required>
             <button>Create</button>
         </form>
     </div>
+
     <hr>
+
     <div class="todo-list">
         <!-- List of todos -->
         <ul id="todos" hx-get="/todos" hx-swap="innerHTML" hx-trigger="load"></ul>
     </div>
+    <script>
+        // Modal handling script
+        const modal = document.getElementById('alert-modal');
+        const closeModal = document.getElementById('close-modal');
+
+        closeModal.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.getElementById('todo-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Check if user is logged in
+            fetch('auth/me')
+                .then(response => {
+                    if (response.status === 401) {
+                        // Show the modal
+                        modal.style.display = 'block';
+                    } else if (response.ok) {
+                        // Proceed with form submission if the user is authenticated
+                        this.submit();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
 </body>
 </html>
