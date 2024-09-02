@@ -1,6 +1,6 @@
 # FastAPI + HTMX Todo App
 
-A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This app allows users to create, update, toggle, and delete todo items. It also incorporates modern styling for a simple, clean, and visually appealing user interface.
+A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This app allows users to create, update, toggle, and delete todo items. It also incorporates JWT authentication to secure access and modern styling for a simple, clean, and visually appealing user interface.
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@ A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This a
 
 ## Unique Approach
 
-This project demonstrates a unique approach to building web applications by combining FastAPI with HTMX. By leveraging HTMX, the app provides a highly dynamic user experience with real-time updates directly in the browser without requiring full page reloads. This approach showcases how modern libraries can be integrated to create responsive and efficient web applications, even for seemingly simple tasks like managing a Todo list.
+This project demonstrates a unique approach to building web applications by combining FastAPI with HTMX. By leveraging HTMX, the app provides a highly dynamic user experience with real-time updates directly in the browser without requiring full page reloads. Additionally, JWT (JSON Web Token) authentication is integrated to manage user sessions securely. This approach showcases how modern libraries can be integrated to create responsive, efficient, and secure web applications, even for seemingly simple tasks like managing a Todo list.
 
 ## Features
 
@@ -28,6 +28,7 @@ This project demonstrates a unique approach to building web applications by comb
 - Toggle the completion status of todo items.
 - Delete todo items.
 - Real-time updates with HTMX.
+- JWT authentication for secure access.
 
 ## Technologies Used
 
@@ -116,6 +117,12 @@ This project demonstrates a unique approach to building web applications by comb
 - **Update a Todo**: Edit the text directly in the list and it will be updated automatically.
 - **Toggle a Todo**: Click the checkbox to mark a task as completed or not completed.
 - **Delete a Todo**: Click the "❌" button to remove a task from the list.
+
+### Authentication
+
+- **Sign Up**: Go to the sign-up page at `auth/signup-login` to create a new account. Fill in the required details and submit the form to create a new user.
+- **Log In**: Go to the login page at `auth/signup-login` to sign in. Enter your credentials and submit the form. Upon successful login, you will be redirected to the todo list page.
+- **Log Out**: Click the "Log out" option in the dropdown menu to end your session and return to the login page.
 
 ## API Documentation
 
