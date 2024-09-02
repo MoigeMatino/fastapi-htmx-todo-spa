@@ -34,9 +34,9 @@ def verify_token(token: str) -> dict | None:
 
         # Check if the token has expired
         if decoded_token_data["exp"] < int(datetime.now(timezone.utc).timestamp()):
-            return None  # Token has expired
-        return decoded_token_data
+            return {"status": "expired"}  # Token has expired
+        return {"status": "valid", "data": decoded_token_data}
     except jwt.ExpiredSignatureError:
-        return None
+        return {"status": "expired"}  # Explicit token expiry
     except jwt.JWTError:
         return None

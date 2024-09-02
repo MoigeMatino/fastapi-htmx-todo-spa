@@ -147,7 +147,20 @@ def get_current_user(request: Request, session: Session = Depends(get_session)):
 
         if payload is None:
             raise credentials_exception
-        username: str = payload.get("sub")
+
+        if payload["status"] == "expired":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has expired. Please log in again.",
+                headers={
+                    "WWW-Authenticate": "Bearer",
+                },
+            )
+
+        if payload["status"] != "valid":
+            raise credentials_exception
+
+        username: str = payload["data"].get("sub")
         if not username:
             raise credentials_exception
         token_data = TokenData(username=username)
