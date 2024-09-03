@@ -9,41 +9,44 @@ from app.utils.todo import (
 )
 
 
-def test_db_create_todo(override_session):
+def test_db_create_todo(override_session, test_user):
     todo_data = TodoCreate(title="Test Todo Item")
-    todo = db_create_todo(override_session, todo_data)
+    todo = db_create_todo(override_session, todo_data, test_user.id)
 
     assert todo is not None
     assert todo.title == "Test Todo Item"
+    assert todo.user_id is not None
+    assert todo.user_id == test_user.id
 
 
-def test_db_update_todo(override_session):
-    todo_data = TodoCreate(title="Test Todo Item")
-    todo = db_create_todo(override_session, todo_data)
+def test_db_update_todo(override_session, user_and_todo):
+    test_user, test_todo = user_and_todo
 
     updated_todo_title = "Updated Test Todo Item"
-    updated_todo = db_update_todo(override_session, todo.id, updated_todo_title)
+    updated_todo = db_update_todo(override_session, test_todo.id, updated_todo_title)
 
     assert updated_todo is not None
-    assert updated_todo.id == todo.id
+    assert updated_todo.id == test_todo.id
+    assert updated_todo.user_id == test_user.id
     assert updated_todo.title == "Updated Test Todo Item"
 
 
-def test_db_toggle_todo(override_session):
-    todo_data = TodoCreate(title="Test Todo Item", done=True)
-    todo = db_create_todo(override_session, todo_data)
+def test_db_toggle_todo(override_session, user_and_todo):
+    test_user, test_todo = user_and_todo
 
-    toggled_todo = db_toggle_todo(override_session, todo.id)
+    toggled_todo = db_toggle_todo(override_session, test_todo.id)
 
     assert toggled_todo is not None
-    assert toggled_todo.id == todo.id
-    assert not toggled_todo.done
+    assert toggled_todo.id == test_todo.id
+    assert toggled_todo.user_id == test_user.id
+    assert toggled_todo.done
 
 
-def test_db_delete_todo(override_session):
-    todo_data = TodoCreate(title="Test Todo Item")
-    todo = db_create_todo(override_session, todo_data)
+def test_db_delete_todo(override_session, user_and_todo):
+    _, test_todo = user_and_todo
 
-    db_delete_todo(override_session, todo.id)
-    deleted_todo = override_session.exec(select(Todo).where(Todo.id == todo.id)).first()
+    db_delete_todo(override_session, test_todo.id)
+    deleted_todo = override_session.exec(
+        select(Todo).where(Todo.id == test_todo.id)
+    ).first()
     assert deleted_todo is None
