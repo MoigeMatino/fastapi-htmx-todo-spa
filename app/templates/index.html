@@ -30,11 +30,19 @@
         {% endif %}
     </div>
 
-    <!-- Modal for alert -->
-    <div id="alert-modal" class="modal">
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
         <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
-            <p>You must be logged in to create a todo item. <a href="auth/signup-login">Log in</a> first.</p>
+            <p>You must be logged in to create a todo item. Please log in first.</p>
+            <a href="/auth/signup-login">Go to Login</a>
+        </div>
+    </div>
+
+    <!-- Token Expired Modal -->
+    <div id="token-expired-modal" class="modal">
+        <div class="modal-content">
+            <p>Your session has expired. Please log in again.</p>
+            <a href="/auth/signup-login">Go to Login</a>
         </div>
     </div>
 
@@ -57,38 +65,48 @@
         <!-- List of todos -->
         <ul id="todos" hx-get="/todos" hx-swap="innerHTML" hx-trigger="load"></ul>
     </div>
+
     <script>
         // Modal handling script
-        const modal = document.getElementById('alert-modal');
-        const closeModal = document.getElementById('close-modal');
+        const alertModal = document.getElementById('auth-modal');
+        const expiryModal = document.getElementById('token-expired-modal');
+        const closeButtons = document.querySelectorAll('.close-modal');
 
-        closeModal.onclick = function() {
-            modal.style.display = 'none';
-        }
 
+        // Modal and user menu close handling script
         window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            // Close the modal if the user clicks outside of it
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
-        }
 
+            // Close the user menu if the user clicks outside of it
+            if (!event.target.closest('.user-menu') && document.querySelector('.user-menu input[type="checkbox"]').checked) {
+                document.querySelector('.user-menu input[type="checkbox"]').checked = false;
+            }
+    };
+
+        // Handle HTMX response error events
+        document.addEventListener('htmx:responseError', function(event) {
+            const status = event.detail.xhr.status;
+
+            if (status === 401) {
+                // Unauthorized - Show the appropriate modal
+                if (event.detail.xhr.responseText.includes("expired")) {
+                    // Token has expired
+                    expiryModal.style.display = 'block';
+                } else {
+                    // User is not logged in
+                    alertModal.style.display = 'block';
+                }
+            }
+        });
+
+        // Submit todo form using HTMX
         document.getElementById('todo-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Check if user is logged in
-            fetch('auth/me')
-                .then(response => {
-                    if (response.status === 401) {
-                        // Show the modal
-                        modal.style.display = 'block';
-                    } else if (response.ok) {
-                        // Proceed with form submission if the user is authenticated
-                        this.submit();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            htmx.trigger(this, 'submit');
         });
     </script>
 </body>

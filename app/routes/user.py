@@ -8,7 +8,7 @@ from sqlmodel import Session
 
 from app.db import get_session
 from app.models.user import User
-from app.utils.jwt import create_access_token
+from app.utils.jwt import create_access_token, verify_token
 from app.utils.user import (
     authenticate_user,
     create_user_in_db,
@@ -88,3 +88,27 @@ async def get_me(current_user: User = Depends(get_current_user)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
     return current_user
+
+
+@router.get("/check-auth")
+async def check_auth(request: Request):
+    token = request.cookies.get("Authorization")
+
+    if not token:
+        return {"status": "unauthorised"}
+
+    # Remove the "Bearer " prefix if it exists
+    token = token.replace("Bearer ", "")
+
+    token_status = verify_token(token)
+
+    if not token_status:
+        return {"status": "unauthorised"}
+
+    if token_status["status"] == "expired":
+        return {
+            "status": "expired",
+            "message": "Your session has expired. Please log in again.",
+        }
+
+    return {"status": "valid", "message": "Token is valid"}
