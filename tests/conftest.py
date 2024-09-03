@@ -9,6 +9,7 @@ from app.db import get_session
 from app.dependencies import get_test_settings
 from app.models.todo import Todo, TodoCreate  # noqa: F401
 from app.models.user import UserCreate
+from app.utils.jwt import create_access_token
 from app.utils.todo import db_create_todo
 from app.utils.user import create_user_in_db
 
@@ -88,3 +89,15 @@ def user_and_todo_fixture(test_user, override_session):
     todo_data = TodoCreate(title="Test Todo Item")
     todo = db_create_todo(override_session, todo_data, test_user.id)
     return test_user, todo
+
+
+@pytest.fixture
+def logged_in_user(override_session):
+    # Create a test user
+    user_data = UserCreate(username="test_user", password="password123")
+    user = create_user_in_db(user_data.username, user_data.password, override_session)
+
+    # Generate a token or session data directly
+    token = create_access_token({"sub": user.username})
+
+    return {"cookie": token, "user_id": user.id, "username": user.username}
