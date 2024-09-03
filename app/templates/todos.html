@@ -2,10 +2,10 @@
 <li>
   <!-- Input for updating the title -->
   <input name="title" value="{{todo.title}}" {% if todo.done %}style="text-decoration: line-through" disabled="true"{% endif %} hx-put="/todos/{{todo.id}}" hx-target="#todos" hx-swap="innerHTML" hx-trigger="keyup changed delay:250ms">
-   <!-- Checkbox for toggling the done status -->
+  <!-- Checkbox for toggling the done status -->
   <input type="checkbox" {% if todo.done %}checked="true"{% endif %} hx-post="/todos/{{todo.id}}/toggle" hx-target="#todos" hx-swap="innerHTML">
   <!-- Button for deleting the todo -->
-   <!-- important to note the idempotent nature of delete method/operation -->
+  <!-- important to note the idempotent nature of delete method/operation -->
   <input type="button" value="❌" hx-delete="/todos/{{todo.id}}/delete" hx-target="#todos" hx-swap="innerHTML">
 </li>
 {% endfor %}
