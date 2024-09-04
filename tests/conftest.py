@@ -65,14 +65,6 @@ def client(override_session):
     app.dependency_overrides.pop(get_session, None)
 
 
-# Fixture for creating a test todo
-@pytest.fixture(name="test_todo", scope="function")
-def create_todo_fixture(override_session) -> Todo:
-    todo_data = TodoCreate(title="Test Todo Item")
-    todo = db_create_todo(override_session, todo_data)
-    return todo
-
-
 # Fixture for creating a test user
 @pytest.fixture(name="test_user", scope="function")
 def test_user_fixture(override_session):
