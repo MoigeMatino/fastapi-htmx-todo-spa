@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 
 from .config import Settings, TestSettings
@@ -21,6 +22,6 @@ def get_settings():
     return Settings()
 
 
-@lru_cache()
 def get_test_settings():
+    print(f"Current working directory: {os.getcwd()}")
     return TestSettings()

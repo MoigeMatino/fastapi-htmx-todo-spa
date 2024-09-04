@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,7 +12,7 @@ class Settings(BaseSettings):
     secret_key: str
     encryption_algo: str
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file="/.env")
 
 
 class TestSettings(BaseSettings):
@@ -20,4 +22,8 @@ class TestSettings(BaseSettings):
     db_host: str
     db_port: str
 
-    model_config = SettingsConfigDict(env_file=".env.test")
+    model_config = SettingsConfigDict(
+        env_file=os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", ".env.test")
+        )
+    )
