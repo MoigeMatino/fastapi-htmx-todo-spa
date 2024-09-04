@@ -25,5 +25,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  test_db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: fastapi_todo_test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    ports:
+      - 5434:5432
+
 volumes:
   pg-data:

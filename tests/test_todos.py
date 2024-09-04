@@ -77,3 +77,8 @@ def test_delete_todo(client, override_session, logged_in_user):
     response = client.get("/todos", cookies=cookies)
     assert response.status_code == 200
     assert "Delete Todo" not in response.text
+
+
+def test_db_connection(override_session):
+    print(f"Connected to database: {override_session.bind.url}")
+    assert "test_db" in str(override_session.bind.url)

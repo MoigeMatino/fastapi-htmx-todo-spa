@@ -13,7 +13,6 @@ async def lifespan(app: FastAPI):
     # Initialize the database
     init_db()
     yield
-    # Cleanup or shutdown logic can be added here if needed
 
 
 def create_app() -> FastAPI:

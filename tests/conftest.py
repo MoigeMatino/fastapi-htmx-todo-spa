@@ -4,32 +4,32 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 
+# from app import create_app
 from app import app
 from app.db import get_session
-from app.dependencies import get_test_settings
 from app.models.todo import Todo, TodoCreate  # noqa: F401
 from app.models.user import UserCreate
 from app.utils.jwt import create_access_token
 from app.utils.todo import db_create_todo
 from app.utils.user import create_user_in_db
 
+# @pytest.fixture(scope="session")
+# def test_settings():
+#     settings = TestSettings()
+#     print(f"Test settings: {settings.model_dump()}")
+#     return settings
+
 
 @pytest.fixture(scope="session")
-def test_settings():
-    return get_test_settings()
-
-
-@pytest.fixture(scope="session")
-def test_engine(test_settings):
+def test_engine():
     test_database_url = (
-        f"postgresql://{test_settings.postgres_user}:{test_settings.postgres_password}"
-        f"@{test_settings.db_host}/{test_settings.postgres_db}"
+        "postgresql://test_user:test_password@test_db/fastapi_todo_test_db"
     )
+    print(f"Test Database URL: {test_database_url}")
     engine = create_engine(test_database_url, echo=True)
     return engine
 
 
-# Fixture to create a new session for each test with cleanup
 @pytest.fixture(scope="function")
 def session(test_engine):
     # Clean up the database before each test
@@ -39,7 +39,6 @@ def session(test_engine):
     with Session(test_engine) as session:
         yield session
 
-    # Optionally clean up after the test
     SQLModel.metadata.drop_all(bind=test_engine)
 
 
@@ -51,7 +50,7 @@ def override_session_fixture(session: Session):
 
     app.dependency_overrides[get_session] = override_get_session
     yield session
-    app.dependency_overrides = {}
+    app.dependency_overrides.pop(get_session, None)
 
 
 # Fixture provides a TestClient through which API calls can use the test database session
@@ -63,7 +62,7 @@ def client(override_session):
     app.dependency_overrides[get_session] = override_get_session
     with TestClient(app) as client:
         yield client
-    app.dependency_overrides = {}
+    app.dependency_overrides.pop(get_session, None)
 
 
 # Fixture for creating a test todo
