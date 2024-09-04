@@ -130,3 +130,6 @@ The FastAPI application automatically generates API documentation using Swagger 
 
 - **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+## Project url
+- https://roadmap.sh/projects/todo-list-api
