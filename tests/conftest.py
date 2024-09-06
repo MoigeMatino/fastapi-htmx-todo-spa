@@ -25,7 +25,7 @@ def test_engine():
     test_database_url = (
         "postgresql://test_user:test_password@test_db/fastapi_todo_test_db"
     )
-    print(f"Test Database URL: {test_database_url}")
+
     engine = create_engine(test_database_url, echo=True)
     return engine
 
