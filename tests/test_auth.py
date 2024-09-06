@@ -74,3 +74,12 @@ def test_login_invalid_credentials(client, override_session):
     assert response.status_code == 401
     assert "Authorization" not in response.cookies
     assert response.json() == {"detail": "Incorrect username or password"}
+
+
+def test_logout(client):
+    response = client.get(
+        "/auth/logout",
+        allow_redirects=False,
+    )
+    assert response.status_code == 302
+    assert "Authorization" not in response.cookies
