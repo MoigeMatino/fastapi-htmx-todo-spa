@@ -83,3 +83,24 @@ def test_logout(client):
     )
     assert response.status_code == 302
     assert "Authorization" not in response.cookies
+
+
+def test_get_me_authenticated(client, logged_in_user):
+    cookies = {"Authorization": logged_in_user["cookie"]}
+    response = client.get("/auth/me", cookies=cookies)
+    assert response.status_code == 200
+    assert "username" in response.json()
+
+
+def test_check_auth_valid_logged_in_user(client, logged_in_user):
+    cookies = {"Authorization": logged_in_user["cookie"]}
+
+    response = client.get("/auth/check-auth", cookies=cookies)
+    assert response.status_code == 200
+    assert response.json()["status"] == "valid"
+
+
+def test_check_auth_valid_non_logged_in_user(client):
+    response = client.get("/auth/check-auth")
+    assert response.status_code == 200
+    assert response.json()["status"] == "unauthorised"
