@@ -1,6 +1,16 @@
 from typing import Annotated, Union
 
-from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    Header,
+    HTTPException,
+    Request,
+    UploadFile,
+)
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -9,6 +19,7 @@ from sqlmodel import Session
 from app.db import get_session
 from app.models.todo import TodoCreate
 from app.models.user import User
+from app.tasks import upload_file
 from app.utils.todo import (
     db_create_todo,
     db_delete_todo,
@@ -46,9 +57,11 @@ async def list_todos(
 
 
 @router.post("/todos", response_class=HTMLResponse)
-async def create_todo(
+def create_todo(
     request: Request,
     todo: Annotated[str, Form()],  # form parsing
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(None),
     hx_request: Annotated[Union[str, None], Header()] = None,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
@@ -58,7 +71,10 @@ async def create_todo(
 
     try:
         # Create an instance of `Todo` from the validated `TodoCreate` data
-        db_create_todo(session, todo_data, current_user.id)
+        new_todo = db_create_todo(session, todo_data, current_user.id)
+        # Check if the file was provided
+        if file:
+            background_tasks.add_task(upload_file, file, new_todo.id)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
