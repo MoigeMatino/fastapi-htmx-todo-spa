@@ -1,3 +1,4 @@
+import os
 from typing import Annotated, Union
 
 from fastapi import (
@@ -57,7 +58,7 @@ async def list_todos(
 
 
 @router.post("/todos", response_class=HTMLResponse)
-def create_todo(
+async def create_todo(
     request: Request,
     todo: Annotated[str, Form()],  # form parsing
     background_tasks: BackgroundTasks,
@@ -74,7 +75,13 @@ def create_todo(
         new_todo = db_create_todo(session, todo_data, current_user.id)
         # Check if the file was provided
         if file:
-            background_tasks.add_task(upload_file, file, new_todo.id)
+            file_content = await file.read()
+            # Create a unique filename
+            file_extension = os.path.splitext(file.filename)[1]
+            unique_filename = f"{new_todo.id}{file_extension}"
+            background_tasks.add_task(
+                upload_file, file_content, unique_filename, new_todo.id
+            )
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 

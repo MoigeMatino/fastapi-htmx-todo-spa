@@ -1,33 +1,42 @@
 import os
 
-from fastapi import UploadFile
+import aiofiles
 
 from app.utils.todo import get_todo_by_id
 
 UPLOAD_DIR = "uploads"
 
 
-async def upload_file(file: UploadFile, todo_id: str):
+async def upload_file(file_content: bytes, filename: str, todo_id: str):
     from app.db import SessionLocal
 
-    with SessionLocal() as session:
+    session = None
+    try:
+        session = SessionLocal()
+
         # Ensure the upload directory exists
         os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-        # Generate a unique filename
-        file_extension = os.path.splitext(file.filename)[1]
-        unique_filename = f"{todo_id}{file_extension}"
-        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+        # Create the file path
+        file_path = os.path.join(UPLOAD_DIR, filename)
 
-        # Save the file
-        with open(file_path, "wb") as f:
-            content = await file.read()
-            f.write(content)
+        # Save the file with the content provided
+        async with aiofiles.open(file_path, "wb") as f:
+            await f.write(file_content)
 
         # Update the todo with the uploaded file path
         todo = get_todo_by_id(session, todo_id)
-        todo.file_name = unique_filename
-        # TODO: replace file_url with file_path
-        todo.file_url = file_path
+        todo.file_name = filename
+        todo.file_path = file_path
+
         session.add(todo)
         session.commit()
+
+    except Exception as e:
+        print(f"Error: {e}")
+        if session:
+            session.rollback()
+        raise
+    finally:
+        if session:
+            session.close()

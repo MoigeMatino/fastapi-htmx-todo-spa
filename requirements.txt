@@ -1,3 +1,6 @@
+aiofiles==24.1.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c \
+    --hash=sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5
 alembic==1.13.2 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:1ff0ae32975f4fd96028c39ed9bb3c867fe3af956bd7bb37343b54c9fe7445ef \
     --hash=sha256:6b8733129a6224a9a711e17c99b08462dbf7cc9670ba8f2e2ae9af860ceb1953

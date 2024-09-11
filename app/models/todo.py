@@ -13,7 +13,7 @@ class Todo(TodoBase, table=True):
     user_id: str | None = Field(default=None, foreign_key="user.id")
 
     user: "User" = Relationship(back_populates="todos")  # type: ignore # noqa: F821
-    file_url: str | None = None
+    file_path: str | None = None
     file_name: str | None = None
 
 
