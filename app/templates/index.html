@@ -14,7 +14,7 @@
 <body>
     <!-- User menu -->
     <div class="user-menu">
-        {% if username %}
+        {% if is_authenticated %}
             <!-- Hidden checkbox to control dropdown visibility -->
             <input type="checkbox" id="dropdown-toggle">
             <label for="dropdown-toggle">

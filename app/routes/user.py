@@ -57,7 +57,8 @@ def login(
     access_token = create_access_token({"sub": authenticated_user.username})
     # Create a redirect response
     response = RedirectResponse(
-        url=f"/?username={authenticated_user.username}",
+        # url=f"/?username={authenticated_user.username}",
+        url="/",
         status_code=status.HTTP_303_SEE_OTHER,
     )
 
