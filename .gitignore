@@ -10,3 +10,4 @@ poetry.lock
 db/password.txt
 .env
 .env.test
+uploads/

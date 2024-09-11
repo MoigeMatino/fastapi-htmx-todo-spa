@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select
 
 from app.models.todo import Todo, TodoCreate
@@ -8,6 +9,33 @@ def db_get_user_todos(session: Session, user_id: str):
     statement = select(Todo).where(Todo.user_id == user_id)
     todos = session.exec(statement).all()
     return todos
+
+
+def get_todo_by_id(session: Session, todo_id: str):
+    try:
+        statement = select(Todo).where(Todo.id == todo_id)
+        todo = session.exec(statement).first()
+
+        if not todo:
+            # Raise an HTTPException if the Todo is not found
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Todo with id {todo_id} not found",
+            )
+        return todo
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred while retrieving the Todo",
+        ) from e
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred",
+        ) from e
 
 
 def db_create_todo(session: Session, todo_data: TodoCreate, user_id: str):
