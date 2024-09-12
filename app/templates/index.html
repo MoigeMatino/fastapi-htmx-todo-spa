@@ -11,7 +11,13 @@
     <link rel="stylesheet" href="/static/main.css">
 
 </head>
-<body>
+<!-- /**
+ * Loads the authentication status of the user when the page is loaded.
+ * Executed on page load and checks the user's authentication
+ * status on the server. The result is used to update the user menu in the
+ * HTML without a full page refresh.
+ */ -->
+<body hx-trigger="load" hx-get="/auth/check-auth" hx-swap="none">
     <!-- User menu -->
     <div class="user-menu">
         {% if is_authenticated %}
@@ -86,7 +92,7 @@
             }
     };
 
-        // Handle HTMX response error events
+        // Handle HTMX response error events relating to token expiry and invalidity
         document.addEventListener('htmx:responseError', function(event) {
             const status = event.detail.xhr.status;
 
@@ -108,6 +114,8 @@
 
             htmx.trigger(this, 'submit');
         });
+
+
     </script>
 </body>
 </html>
