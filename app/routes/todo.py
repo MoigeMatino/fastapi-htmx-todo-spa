@@ -9,6 +9,8 @@ from sqlmodel import Session
 from app.db import get_session
 from app.models.todo import TodoCreate
 from app.models.user import User
+from app.routes.user import check_auth
+from app.utils.jwt import verify_token
 from app.utils.todo import (
     db_create_todo,
     db_delete_todo,
@@ -23,14 +25,25 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/", response_class=HTMLResponse)
-def index(request: Request, current_user: User = Depends(get_current_user)):
+async def index(request: Request):
     # username = request.query_params.get("username", "")
+    auth_status = await check_auth(request)
+    auth_status_value = auth_status.get("status")
+    is_authenticated = False
+    username = None
+
+    if auth_status_value == "valid":
+        token = request.cookies.get("Authorization", "").replace("Bearer ", "")
+        payload = verify_token(token)
+        is_authenticated = True
+        username = payload["data"].get("sub")
+
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "is_authenticated": current_user is not None,
-            "username": current_user.username if current_user else None,
+            "is_authenticated": is_authenticated,
+            "username": username,
         },
     )
 
