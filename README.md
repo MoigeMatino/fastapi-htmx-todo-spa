@@ -108,7 +108,7 @@ This project demonstrates a unique approach to building web applications by comb
 - `Dockerfile`: The Dockerfile for building the FastAPI app image.
 - `docker-compose.yml`: Docker Compose configuration file.
 - `app/templates/index.html`: The main HTML file for rendering the todo list.
-- `app/static/styles.css`: The CSS file for styling the app.
+- `app/static/styles.css`: The main CSS file for styling the app.
 - `scripts/run_tests.sh`: Script for running tests with Docker Compose.
 
 ## Usage
