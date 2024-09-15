@@ -1,4 +1,4 @@
-# FastAPI + HTMX Todo App
+# FastAPI + HTMX Todo SPA
 
 A simple Todo application built with FastAPI, HTMX, and Jinja2 templates. This app allows users to create, update, toggle, and delete todo items. It also incorporates JWT authentication to secure access and modern styling for a simple, clean, and visually appealing user interface.
 
